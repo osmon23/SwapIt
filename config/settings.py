@@ -29,6 +29,13 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+MY_APPS = [
+
+]
+
+THIRD_PARTY_APPS = [
+    'corsheaders',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -37,11 +44,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-]
+] + MY_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -121,3 +129,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Allow requests from all domains (you can customize this based on your needs)
+CORS_ORIGIN_ALLOW_ALL = True
+
+# If you want to allow specific origins instead of all, you can use:
+# CORS_ALLOWED_ORIGINS = [
+#     "http://example.com",
+#     "https://example.com",
+#     # Add more origins as needed
+# ]
