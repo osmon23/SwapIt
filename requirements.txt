@@ -1,2 +1,4 @@
 django==4.2.1
 django-cors-headers==4.0.0
+psycopg2-binary==2.9.6
+python-decouple==3.8
