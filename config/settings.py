@@ -26,7 +26,7 @@ SECRET_KEY = env_config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_config('DEBUG')
 
-ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split(' ')
+ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split(', ')
 
 
 # Application definition
@@ -136,7 +136,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Allow requests from all domains (you can customize this based on your needs)
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = env_config('CORS_ORIGIN_ALLOW_ALL', False, cast=bool)
 
 # If you want to allow specific origins instead of all, you can use:
 # CORS_ALLOWED_ORIGINS = [
