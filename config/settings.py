@@ -135,6 +135,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
 # Allow requests from all domains (you can customize this based on your needs)
 CORS_ORIGIN_ALLOW_ALL = env_config('CORS_ORIGIN_ALLOW_ALL', False, cast=bool)
 
