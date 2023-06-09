@@ -2,14 +2,30 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import get_user_model
 
+from phonenumber_field.serializerfields import PhoneNumberField
+from phonenumber_field.phonenumber import PhoneNumber
+
 from rest_framework import serializers
-from rest_framework_simplejwt.tokens import RefreshToken
+
+from config import settings
 
 User = get_user_model()
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     password = serializers.CharField(write_only=True)
+    phone_number = PhoneNumberField()
+
+    def create(self, validated_data):
+        default_region = getattr(settings, 'PHONENUMBER_DEFAULT_REGION', None)
+
+        if default_region:
+            phone_number = validated_data['phone_number']
+            updated_phone_number = PhoneNumber.from_string(str(phone_number), default_region)
+            validated_data['phone_number'] = updated_phone_number
+            print(validated_data['phone_number'])
+
+        return super().create(validated_data)
 
     class Meta:
         model = User
@@ -18,8 +34,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'url',
             'username',
             'email',
-            'first_name',
-            'last_name',
+            'phone_number',
+            'created_at',
             'password',
         )
 

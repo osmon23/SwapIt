@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import contextlib
 from datetime import timedelta
 from pathlib import Path
 from decouple import config as env_config
@@ -27,7 +28,7 @@ SECRET_KEY = env_config('SECRET_KEY')
 DEBUG = env_config('DEBUG')
 
 # ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split(',')
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split()
 
 # Application definition
 MY_APPS = [
@@ -41,6 +42,7 @@ THIRD_PARTY_APPS = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     'drf_spectacular_sidecar',
+    'phonenumber_field',
 ]
 
 INSTALLED_APPS = [
@@ -184,3 +186,9 @@ SPECTACULAR_SETTINGS = {
     'REDOC_DIST': 'SIDECAR',
     # OTHER SETTINGS
 }
+
+# PHONENUMBER DEFAULT REGION
+PHONENUMBER_DEFAULT_REGION = 'KG'
+
+with contextlib.suppress(ImportError):
+    from .local_settings import *

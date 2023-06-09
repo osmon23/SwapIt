@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 
+from phonenumber_field.modelfields import PhoneNumberField
+
 from apps.accounts.managers import CustomUserManager
 
 
@@ -10,17 +12,14 @@ class CustomUser(AbstractUser):
         _('Email'),
         unique=True,
     )
-    first_name = models.CharField(
-        _('Имя'),
-        max_length=255,
-        null=True,
-        blank=True,
+    phone_number = PhoneNumberField(
+        _("Номер телефона"),
+        max_length=100,
+        unique=True
     )
-    last_name = models.CharField(
-        _('Фамилия'),
-        max_length=255,
-        null=True,
-        blank=True,
+    created_at = models.DateTimeField(
+        _('Дата создания'),
+        auto_now_add=True
     )
 
     objects = CustomUserManager()
