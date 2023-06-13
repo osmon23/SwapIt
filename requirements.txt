@@ -9,3 +9,4 @@ drf-spectacular-sidecar==2023.6.1
 django-phonenumber-field==7.1.0
 phonenumbers==8.13.13
 django-mptt==0.14.0
+django-filter==23.2

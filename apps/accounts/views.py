@@ -1,12 +1,13 @@
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model, authenticate
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import UserSerializer, GroupSerializer, UserLoginSerializer, UserRegistrationSerializer
@@ -21,6 +22,14 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['is_active']
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.is_active = False
+        user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -62,7 +71,5 @@ class UserRegistrationView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
-            print(TokenObtainPairSerializer.validated_data)
-            print(RefreshToken.for_user(user))
             return Response({'message': 'Пользователь успешно зарегистрирован', 'refresh': str(refresh), 'access': str(refresh.access_token)}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

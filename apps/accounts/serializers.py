@@ -15,6 +15,7 @@ User = get_user_model()
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     password = serializers.CharField(write_only=True)
     phone_number = PhoneNumberField()
+    is_active = serializers.BooleanField(read_only=True)
 
     def create(self, validated_data):
         default_region = getattr(settings, 'PHONENUMBER_DEFAULT_REGION', None)
@@ -23,7 +24,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             phone_number = validated_data['phone_number']
             updated_phone_number = PhoneNumber.from_string(str(phone_number), default_region)
             validated_data['phone_number'] = updated_phone_number
-            print(validated_data['phone_number'])
+
+        validated_data['is_active'] = True
 
         return super().create(validated_data)
 
@@ -37,6 +39,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'phone_number',
             'created_at',
             'password',
+            'is_active',
         )
 
 
@@ -64,7 +67,7 @@ class UserLoginSerializer(serializers.Serializer):
 class UserRegistrationSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField(required=True)
-    phone_number = serializers.CharField(required=True)
+    phone_number = PhoneNumberField()
     password = serializers.CharField(write_only=True)
 
     def validate_password(self, value):
