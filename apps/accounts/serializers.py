@@ -64,6 +64,7 @@ class UserLoginSerializer(serializers.Serializer):
 class UserRegistrationSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField(required=True)
+    phone_number = serializers.CharField(required=True)
     password = serializers.CharField(write_only=True)
 
     def validate_password(self, value):
@@ -74,6 +75,7 @@ class UserRegistrationSerializer(serializers.Serializer):
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
+            phone_number=validated_data['phone_number'],
             password=validated_data['password']
         )
         return user
@@ -83,5 +85,6 @@ class UserRegistrationSerializer(serializers.Serializer):
         fields = (
             'username',
             'email',
+            'phone_number',
             'password'
         )

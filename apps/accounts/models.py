@@ -11,6 +11,8 @@ class CustomUser(AbstractUser):
     email = models.EmailField(
         _('Email'),
         unique=True,
+        null=True,
+        blank=True
     )
     phone_number = PhoneNumberField(
         _("Номер телефона"),

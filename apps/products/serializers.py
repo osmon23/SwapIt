@@ -29,9 +29,22 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.HyperlinkedModelSerializer):
-    category = CategorySerializer(read_only=True)
-    image = ProductImageSerializer
+    category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all())
+    image = ProductImageSerializer(many=True, read_only=True)
+    created_by = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = (
+            'id',
+            'category',
+            'created_by',
+            'name',
+            'description',
+            'quantity',
+            'image',
+        )
+        read_only_fields = (
+            'id',
+            'created_by',
+        )

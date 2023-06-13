@@ -1,7 +1,11 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from mptt.models import MPTTModel, TreeForeignKey
+
+
+User = get_user_model()
 
 
 class Category(MPTTModel):
@@ -47,7 +51,13 @@ class Product(models.Model):
         Category,
         on_delete=models.CASCADE,
         verbose_name=_('Категория'),
-        related_name='products'
+        related_name='products',
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name=_('Создано пользователем'),
+        related_name='created_products'
     )
 
     def __str__(self):
