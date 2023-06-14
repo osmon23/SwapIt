@@ -33,6 +33,7 @@ ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split()
 MY_APPS = [
     'apps.accounts',
     'apps.products',
+    'apps.rating',
 ]
 
 THIRD_PARTY_APPS = [
@@ -123,7 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 

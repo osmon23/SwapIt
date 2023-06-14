@@ -25,6 +25,21 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['is_active']
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        user = serializer.instance
+
+        refresh = RefreshToken.for_user(user)
+        data = {
+            'message': 'Пользователь успешно зарегистрирован',
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }
+        headers = self.get_success_headers(serializer.data)
+        return Response(data, status=status.HTTP_201_CREATED, headers=headers)
+
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
         user.is_active = False
