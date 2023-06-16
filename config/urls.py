@@ -40,9 +40,8 @@ swagger_urlpatterns = [
 api_v1_urlpatterns = [
     path('schema/', include(swagger_urlpatterns)),
     path('token/', include(auth_urlpatterns)),
-    path('accounts-', include('apps.accounts.urls')),
-    path('products-', include('apps.products.urls')),
-    # path('rating/', include('apps.rating.urls')),
+    path('accounts/', include('apps.accounts.urls')),
+    path('products/', include('apps.products.urls')),
 ]
 
 urlpatterns = [

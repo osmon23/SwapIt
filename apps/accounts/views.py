@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model, authenticate
+from django.db.models import Avg
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -10,7 +11,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import UserSerializer, GroupSerializer, UserLoginSerializer, UserRegistrationSerializer
+from .models import Rating
+from .serializers import UserSerializer, GroupSerializer, UserLoginSerializer, UserRegistrationSerializer, RatingSerializer
 
 User = get_user_model()
 
@@ -25,20 +27,14 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['is_active']
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        user = serializer.instance
-
-        refresh = RefreshToken.for_user(user)
-        data = {
-            'message': 'Пользователь успешно зарегистрирован',
-            'refresh': str(refresh),
-            'access': str(refresh.access_token)
-        }
-        headers = self.get_success_headers(serializer.data)
-        return Response(data, status=status.HTTP_201_CREATED, headers=headers)
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        ratings_received = Rating.objects.filter(to_user=instance)
+        rating_serializer = RatingSerializer(ratings_received, many=True)
+        data = serializer.data
+        data['received_ratings'] = rating_serializer.data
+        return Response(data)
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
@@ -88,3 +84,41 @@ class UserRegistrationView(APIView):
             refresh = RefreshToken.for_user(user)
             return Response({'message': 'Пользователь успешно зарегистрирован', 'refresh': str(refresh), 'access': str(refresh.access_token)}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RatingViewSet(viewsets.ModelViewSet):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        from_user = request.user
+        to_user_id = request.data.get('to_user')
+        rating_value = request.data.get('rating')
+
+        if to_user_id is None or rating_value is None:
+            return Response({'error': 'Необходимо указать идентификатор пользователя и значение рейтинга'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            to_user = User.objects.get(pk=to_user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'Пользователь с указанным идентификатором не существует'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if from_user == to_user:
+            return Response({'error': 'Нельзя оценить самого себя'}, status=status.HTTP_400_BAD_REQUEST)
+
+        existing_rating = Rating.objects.filter(from_user=from_user, to_user=to_user).exists()
+        if existing_rating:
+            return Response({'error': 'Вы уже оценили этого пользователя'}, status=status.HTTP_400_BAD_REQUEST)
+
+        rating = Rating(from_user=from_user, to_user=to_user, rating=rating_value)
+        rating.save()
+
+        # Обновление рейтинга у пользователя, к которому была оставлена оценка
+        updated_rating = Rating.objects.filter(to_user=to_user).aggregate(Avg('rating'))
+        to_user.rating = updated_rating['rating__avg']
+        to_user.save()
+
+        return Response({'message': 'Оценка успешно добавлена'}, status=status.HTTP_201_CREATED)

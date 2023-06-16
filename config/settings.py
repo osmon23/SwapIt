@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env_config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env_config('DEBUG')
+DEBUG = env_config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split()
 
@@ -33,7 +33,6 @@ ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split()
 MY_APPS = [
     'apps.accounts',
     'apps.products',
-    'apps.rating',
 ]
 
 THIRD_PARTY_APPS = [
@@ -171,8 +170,14 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'TOKEN_USER_CLASS': 'apps.accounts.models.CustomUser',
+    'TOKEN_SERIALIZER': 'apps.accounts.serializers.CustomTokenObtainPairSerializer',
+    'TOKEN_REFRESH_SERIALIZER': 'apps.accounts.serializers.CustomTokenRefreshSerializer',
 }
 
 # drf_spectacular config

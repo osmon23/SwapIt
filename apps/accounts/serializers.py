@@ -3,31 +3,25 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import get_user_model
 
 from phonenumber_field.serializerfields import PhoneNumberField
-from phonenumber_field.phonenumber import PhoneNumber
 
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
-from config import settings
+from apps.accounts.models import Rating
 
 User = get_user_model()
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     password = serializers.CharField(write_only=True)
-    phone_number = PhoneNumberField()
     is_active = serializers.BooleanField(read_only=True)
+    rating = serializers.SerializerMethodField()
 
-    def create(self, validated_data):
-        default_region = getattr(settings, 'PHONENUMBER_DEFAULT_REGION', None)
-
-        if default_region:
-            phone_number = validated_data['phone_number']
-            updated_phone_number = PhoneNumber.from_string(str(phone_number), default_region)
-            validated_data['phone_number'] = updated_phone_number
-
-        validated_data['is_active'] = True
-
-        return super().create(validated_data)
+    def get_rating(self, obj):
+        ratings = obj.received_ratings.all()
+        if ratings.exists():
+            return sum(rating.rating for rating in ratings) / ratings.count()
+        return 0
 
     class Meta:
         model = User
@@ -35,6 +29,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'id',
             'url',
             'username',
+            'rating',
             'email',
             'phone_number',
             'created_at',
@@ -90,4 +85,30 @@ class UserRegistrationSerializer(serializers.Serializer):
             'email',
             'phone_number',
             'password'
+        )
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        return data
+
+
+class CustomTokenRefreshSerializer(TokenRefreshSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        return data
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    from_user = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Rating
+        fields = (
+            'id',
+            'from_user',
+            'to_user',
+            'rating',
+            'created_at'
         )

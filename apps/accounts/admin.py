@@ -8,6 +8,7 @@ class CustomUserManagerAdmin(admin.ModelAdmin):
     list_display = (
         'email',
         'username',
+        'rating',
         'phone_number',
         'created_at',
     )
