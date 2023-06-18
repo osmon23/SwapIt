@@ -22,18 +22,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env_config('SECRET_KEY')
+SECRET_KEY = env_config('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env_config('DEBUG')
+DEBUG = env_config('DEBUG', '')
 
 # ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split(',')
-ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split()
+ALLOWED_HOSTS = env_config('ALLOWED_HOSTS', '').split()
 
 # Application definition
 MY_APPS = [
     'apps.accounts',
     'apps.products',
+    'apps.chat'
 ]
 
 THIRD_PARTY_APPS = [
@@ -93,11 +94,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env_config('POSTGRES_DB'),
-        'USER': env_config('POSTGRES_USER'),
-        'PASSWORD': env_config('POSTGRES_PASSWORD'),
-        'HOST': env_config('POSTGRES_HOST'),
-        'PORT': env_config('POSTGRES_PORT'),
+        'NAME': env_config('POSTGRES_DB', ''),
+        'USER': env_config('POSTGRES_USER', ''),
+        'PASSWORD': env_config('POSTGRES_PASSWORD', ''),
+        'HOST': env_config('POSTGRES_HOST', ''),
+        'PORT': env_config('POSTGRES_PORT', ''),
     }
 }
 

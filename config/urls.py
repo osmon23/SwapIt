@@ -47,4 +47,5 @@ api_v1_urlpatterns = [
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include(api_v1_urlpatterns)),
+    path('chat/', include('apps.chat.urls')),
 ]
