@@ -69,8 +69,9 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    image = models.URLField(
-        _('Изображение')
+    image = models.ImageField(
+        _('Изображение'),
+        upload_to='product_images/'
     )
     product = models.ForeignKey(
         Product,

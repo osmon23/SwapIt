@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import contextlib
+import os
 from datetime import timedelta
 from pathlib import Path
 from decouple import config as env_config
@@ -25,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env_config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env_config('DEBUG', cast=bool)
+DEBUG = env_config('DEBUG', cast=bool, default=False)
 
 ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split()
 
@@ -33,6 +34,7 @@ ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split()
 MY_APPS = [
     'apps.accounts',
     'apps.products',
+    'apps.chat',
 ]
 
 THIRD_PARTY_APPS = [
@@ -46,6 +48,7 @@ THIRD_PARTY_APPS = [
 ]
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -83,8 +86,8 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'config.asgi.application'
 WSGI_APPLICATION = 'config.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -135,7 +138,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [STATIC_DIR]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -193,8 +201,22 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
+REDIS_HOST = env_config('REDIS_HOST')
+REDIS_PORT = env_config('REDIS_PORT')
+
+MPTT_ADMIN_LEVEL_INDENT = 20
+
 # PHONENUMBER DEFAULT REGION
 PHONENUMBER_DEFAULT_REGION = 'KG'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
+        },
+    },
+}
 
 with contextlib.suppress(ImportError):
     from .local_settings import *

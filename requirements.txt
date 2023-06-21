@@ -1,4 +1,5 @@
 django==4.2.1
+pillow==9.5.0
 django-cors-headers==4.0.0
 psycopg2-binary==2.9.6
 python-decouple==3.8
@@ -10,3 +11,5 @@ django-phonenumber-field==7.1.0
 phonenumbers==8.13.13
 django-mptt==0.14.0
 django-filter==23.2
+channels["daphne"]==4.0.0
+channels-redis==4.1.0

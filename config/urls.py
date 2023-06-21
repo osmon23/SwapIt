@@ -42,6 +42,7 @@ api_v1_urlpatterns = [
     path('token/', include(auth_urlpatterns)),
     path('accounts/', include('apps.accounts.urls')),
     path('products/', include('apps.products.urls')),
+    path('chat/', include('apps.chat.urls')),
 ]
 
 urlpatterns = [
