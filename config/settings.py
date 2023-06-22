@@ -28,7 +28,7 @@ SECRET_KEY = env_config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split()
+ALLOWED_HOSTS = env_config('ALLOWED_HOSTS').split(',')
 
 # Application definition
 MY_APPS = [
@@ -217,6 +217,12 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# CSRF
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:8000",
+]
 
 with contextlib.suppress(ImportError):
     from .local_settings import *

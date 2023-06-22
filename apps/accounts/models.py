@@ -12,11 +12,14 @@ class CustomUser(AbstractUser):
     email = models.EmailField(
         _('Email'),
         unique=True,
+        max_length=255,
     )
     phone_number = PhoneNumberField(
         _("Номер телефона"),
         max_length=100,
-        unique=True
+        unique=True,
+        null=True,
+        blank=True,
     )
     created_at = models.DateTimeField(
         _('Дата создания'),
