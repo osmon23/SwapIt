@@ -26,12 +26,35 @@ class ProductImageSerializer(serializers.ModelSerializer):
             'product',
             'image',
         )
+        read_only_fields = (
+            'id',
+            'product',
+        )
+
+
+class ProductImageCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = (
+            'image',
+        )
 
 
 class ProductSerializer(serializers.HyperlinkedModelSerializer):
     category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all())
-    image = ProductImageSerializer(many=True, read_only=True)
+    images = ProductImageCreateSerializer(many=True, required=False)
     created_by = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    def create(self, validated_data):
+        images_data = self.context.get('view').request.FILES  # Получаем данные изображений из запроса
+        validated_data.pop('images', None)  # Удаляем поле images из validated_data
+
+        product = Product.objects.create(**validated_data)
+
+        for image_data in images_data.values():
+            ProductImage.objects.create(product=product, image=image_data)
+
+        return product
 
     class Meta:
         model = Product
@@ -42,7 +65,7 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
             'name',
             'description',
             'quantity',
-            'image',
+            'images',
         )
         read_only_fields = (
             'id',

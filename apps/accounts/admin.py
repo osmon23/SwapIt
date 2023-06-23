@@ -1,10 +1,10 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .models import CustomUser
 
 
-@admin.register(CustomUser)
-class CustomUserManagerAdmin(admin.ModelAdmin):
+class CustomUserAdmin(BaseUserAdmin):
     list_display = (
         'email',
         'username',
@@ -19,6 +19,6 @@ class CustomUserManagerAdmin(admin.ModelAdmin):
     ordering = (
         'email',
     )
-    exclude = (
-        'password',
-    )
+
+
+admin.site.register(CustomUser, CustomUserAdmin)

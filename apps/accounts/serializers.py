@@ -17,7 +17,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     is_active = serializers.BooleanField(read_only=True)
     rating = serializers.SerializerMethodField()
 
-    def get_rating(self, obj):
+    def get_rating(self, obj) -> float:
         ratings = obj.received_ratings.all()
         if ratings.exists():
             return sum(rating.rating for rating in ratings) / ratings.count()
@@ -112,3 +112,12 @@ class RatingSerializer(serializers.ModelSerializer):
             'rating',
             'created_at'
         )
+
+
+class UserPasswordChangeSerializer(serializers.Serializer):
+    current_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        validate_password(value)
+        return value

@@ -1,10 +1,11 @@
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth.password_validation import validate_password
 from django.db.models import Avg
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,7 +13,8 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Rating
-from .serializers import UserSerializer, GroupSerializer, UserLoginSerializer, UserRegistrationSerializer, RatingSerializer
+from .serializers import UserSerializer, GroupSerializer, UserLoginSerializer, UserRegistrationSerializer, \
+    RatingSerializer, UserPasswordChangeSerializer
 
 User = get_user_model()
 
@@ -122,3 +124,28 @@ class RatingViewSet(viewsets.ModelViewSet):
         to_user.save()
 
         return Response({'message': 'Оценка успешно добавлена'}, status=status.HTTP_201_CREATED)
+
+
+class UserPasswordChangeView(generics.UpdateAPIView):
+    serializer_class = UserPasswordChangeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.object = self.get_object()
+            current_password = serializer.validated_data['current_password']
+            new_password = serializer.validated_data['new_password']
+
+            if not self.object.check_password(current_password):
+                return Response({'error': 'Неверный текущий пароль'}, status=status.HTTP_400_BAD_REQUEST)
+
+            validate_password(new_password)
+            self.object.set_password(new_password)
+            self.object.save()
+            return Response({'message': 'Пароль успешно изменен'}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

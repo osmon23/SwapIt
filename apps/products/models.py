@@ -57,7 +57,9 @@ class Product(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name=_('Создано пользователем'),
-        related_name='created_products'
+        related_name='created_products',
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
@@ -77,7 +79,9 @@ class ProductImage(models.Model):
         Product,
         on_delete=models.CASCADE,
         verbose_name=_('Продукт'),
-        related_name='images'
+        related_name='images',
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
