@@ -153,7 +153,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Allow requests from all domains (you can customize this based on your needs)
-CORS_ORIGIN_ALLOW_ALL = env_config('CORS_ORIGIN_ALLOW_ALL', False, cast=bool)
+CORS_ALLOW_ALL_ORIGINS = env_config('CORS_ORIGIN_ALLOW_ALL', False, cast=bool)
+
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
 
 # If you want to allow specific origins instead of all, you can use:
 # CORS_ALLOWED_ORIGINS = [
