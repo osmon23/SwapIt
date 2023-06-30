@@ -61,6 +61,10 @@ class Product(models.Model):
         null=True,
         blank=True,
     )
+    image = models.ImageField(
+        _('Image'),
+        upload_to='images/'
+    )
 
     def __str__(self):
         return self.name
@@ -68,25 +72,3 @@ class Product(models.Model):
     class Meta:
         verbose_name = _('Продукт')
         verbose_name_plural = _('Продукты')
-
-
-class ProductImage(models.Model):
-    image = models.ImageField(
-        _('Изображение'),
-        upload_to='product_images/'
-    )
-    product = models.ForeignKey(
-        Product,
-        on_delete=models.CASCADE,
-        verbose_name=_('Продукт'),
-        related_name='images',
-        null=True,
-        blank=True,
-    )
-
-    def __str__(self):
-        return self.product.name
-
-    class Meta:
-        verbose_name = _('Изображение')
-        verbose_name_plural = _('Изображения')

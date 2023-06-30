@@ -2,12 +2,7 @@ from django.contrib import admin
 
 from mptt.admin import DraggableMPTTAdmin
 
-from .models import Category, Product, ProductImage
-
-
-class ProductImageInline(admin.TabularInline):
-    model = ProductImage
-    extra = 1
+from .models import Category, Product
 
 
 @admin.register(Category)
@@ -41,21 +36,4 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = (
         'name',
         'description',
-    )
-    inlines = (
-        ProductImageInline,
-    )
-
-
-@admin.register(ProductImage)
-class ProductImageAdmin(admin.ModelAdmin):
-    list_display = (
-        'image',
-        'product',
-    )
-    list_filter = (
-        'product',
-    )
-    search_fields = (
-        'product__name',
     )
