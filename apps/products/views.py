@@ -57,7 +57,9 @@
 #         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+
 from .models import Category, Product
 from .serializers import CategorySerializer, ProductSerializer
 
@@ -70,3 +72,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    def perform_create(self, serializer):
+        category_name = self.request.data.get('category')
+        category = Category.objects.get(name=category_name)
+        serializer.save(created_by=self.request.user, category=category)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_deleted = True
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
